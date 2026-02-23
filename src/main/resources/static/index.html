@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Java Roadmap Buddy</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700&display=swap');
+        body { font-family: 'Pretendard', sans-serif; background-color: #f8fafc; }
+        .prose h3 { color: #1e40af; margin-top: 1.5rem; font-weight: bold; border-left: 4px solid #3b82f6; padding-left: 0.5rem; }
+        .prose ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+        .prose hr { margin: 2rem 0; border-color: #e2e8f0; }
+    </style>
+</head>
+<body class="p-4 md:p-10">
+    <div class="max-w-3xl mx-auto">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-slate-800 mb-2">🚀 AI 학습 로드맵 가이드</h1>
+            <p class="text-slate-500">원하는 주제를 입력하면 Gemini 3가 최적의 커리큘럼을 짜드립니다.</p>
+        </header>
+
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
+            <div class="flex flex-col md:flex-row gap-3">
+                <input type="text" id="topic" placeholder="예: Java, Spring Boot, React..." 
+                       class="flex-1 px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                <button onclick="generate()" id="btn"
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md">
+                    로드맵 생성
+                </button>
+            </div>
+        </div>
+
+        <div id="loading" class="hidden text-center py-10">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
+            <p class="mt-2 text-slate-600">AI 멘토가 커리큘럼을 작성 중입니다...</p>
+        </div>
+
+        <div id="result-card" class="hidden bg-white p-8 rounded-2xl shadow-lg border border-slate-100">
+            <div id="result" class="prose max-w-none text-slate-700 leading-relaxed">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        async function generate() {
+            const topic = document.getElementById('topic').value;
+            if(!topic) return alert("주제를 입력해주세요!");
+
+            const btn = document.getElementById('btn');
+            const loading = document.getElementById('loading');
+            const resultCard = document.getElementById('result-card');
+            const resultDiv = document.getElementById('result');
+
+            // UI 초기화
+            btn.disabled = true;
+            loading.classList.remove('hidden');
+            resultCard.classList.add('hidden');
+
+            try {
+                const response = await fetch(`/api/roadmap?topic=${encodeURIComponent(topic)}`);
+                const data = await response.json();
+                
+                // 마크다운을 HTML로 변환하여 삽입
+                resultDiv.innerHTML = marked.parse(data.content);
+                resultCard.classList.remove('hidden');
+            } catch (error) {
+                alert("로드맵 생성 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+            } finally {
+                loading.classList.add('hidden');
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
