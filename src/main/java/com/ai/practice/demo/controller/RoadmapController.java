@@ -26,7 +26,7 @@ public class RoadmapController {
     public record RoadmapRequest(String topic, String passcode) {}
 
     // 2. GetMapping 대신 PostMapping을 사용합니다! URL이 아주 깔끔해집니다.
-    @PostMapping("/api/roadmap")
+    @PostMapping
     public RoadmapResponse getRoadmap(@RequestBody RoadmapRequest request) { 
         // @RequestBody는 "HTTP 가방(Body) 안에 있는 JSON을 열어서 꺼내줘!"라는 뜻입니다.
         
