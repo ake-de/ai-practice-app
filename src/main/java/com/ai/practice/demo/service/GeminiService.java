@@ -1,6 +1,8 @@
 package com.ai.practice.demo.service;
 
 import com.ai.practice.demo.dto.RoadmapResponse;
+import com.ai.practice.demo.entity.Roadmap;
+import com.ai.practice.demo.repository.RoadmapRepository;
 import com.google.genai.Client;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -8,9 +10,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class GeminiService {
 
+    private final RoadmapRepository roadmapRepository;
+
     private final String apiKey;
 
-    public GeminiService(@Value("${google.api.key}") String apiKey) {
+    public GeminiService(RoadmapRepository roadmapRepository, @Value("${google.api.key}") String apiKey) {
+        this.roadmapRepository = roadmapRepository;
         this.apiKey = apiKey;
     }
 
@@ -30,8 +35,16 @@ public class GeminiService {
                 null // Config 인자 추가
             );
 
-            // 3. 결과 텍스트 반환
-            return new RoadmapResponse(response.text());
+            String content = response.text();
+
+            // 2. DB에 저장하기 위해 Entity 객체 생성
+            Roadmap roadmap = new Roadmap(topic, content);
+
+            // 3. DB에 저장! (JPA가 알아서 INSERT SQL을 날려줍니다)
+            roadmapRepository.save(roadmap);
+
+            // 4. 사용자에게 반환
+            return new RoadmapResponse(content);
 
         } catch (Exception e) {
             e.printStackTrace();
