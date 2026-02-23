@@ -4,17 +4,16 @@
 단순한 API 호출을 넘어 **보안 강화, 데이터베이스 연동, Docker 컨테이너화 및 클라우드 CI/CD 배포**까지 백엔드 개발의 Full-cycle을 경험하기 위해 제작된 프로젝트입니다.
 
 ## 🔗 Demo
-- **배포 주소:** [https://ai-practice-app.onrender.com]
-- *(주의: 보안 상의 문제로 중지되었습니다.)*
-
+- **배포 주소:** [여기에 Render URL 주소 입력 (예: https://ai-roadmap.onrender.com)]
+- *(주의: 개인용 포트폴리오 서버이므로 접속 시 Passcode가 필요합니다.)*
 
 ---
 
 ## 🛠️ Tech Stack
 
 **Backend**
-- Java 25
-- Spring Boot 4.0.0
+- Java 21
+- Spring Boot 3.x
 - Spring Data JPA
 - H2 Database (In-memory)
 
@@ -53,6 +52,30 @@
 
 ### 1. 환경 변수 설정
 `src/main/resources/application.properties` 파일에 발급받은 API 키와 임의의 비밀번호를 설정합니다. (또는 시스템 환경변수로 주입)
+
 ```properties
 google.api.key=YOUR_GEMINI_API_KEY
 app.passcode=YOUR_PASSCODE
+```
+
+### 2. Docker로 실행하기
+로컬 환경에서 도커를 이용해 서버를 띄우는 방법입니다.
+
+```bash
+# 1. 이미지 빌드
+docker build -t ai-roadmap-server .
+
+# 2. 컨테이너 실행 (환경변수 주입 및 포트 맵핑)
+docker run -d -p 8080:8080 -e GOOGLE_API_KEY="YOUR_GEMINI_API_KEY" -e APP_PASSCODE="1234" --name roadmap-app ai-roadmap-server
+```
+
+### 3. 접속
+- 웹 브라우저에서 `http://localhost:8080` 으로 접속합니다.
+- H2 DB 콘솔은 `http://localhost:8080/h2-console` (또는 설정한 8082 포트)에서 확인할 수 있습니다.
+
+---
+
+## 🚀 Future Scope (v2.0 업데이트 계획)
+- [ ] **영구 DB 전환:** H2(In-memory)에서 PostgreSQL 또는 MySQL로 마이그레이션하여 데이터 영구 보존
+- [ ] **Spring Security 도입:** 단일 Passcode 방식에서 JWT 기반의 사용자 회원가입 및 개별 히스토리 관리로 고도화
+- [ ] **PDF Export:** 생성된 마크다운 로드맵을 PDF 파일로 다운로드하는 기능 추가
