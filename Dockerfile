@@ -1,14 +1,17 @@
-# 1. 실행 환경: Java 21 (또는 사용 중인 자바 버전에 맞게 17 등으로 변경 가능)
-FROM eclipse-temurin:25-jdk-alpine
-
-# 2. 작업 디렉토리 설정
+# --- 1단계: 요리하기 (소스 코드를 빌드해서 .jar 파일 만들기) ---
+FROM eclipse-temurin:25-jdk AS builder
 WORKDIR /app
+# 깃허브에 있는 모든 소스 코드를 도커 안으로 복사
+COPY . .
+# 권한을 주고 메이븐으로 빌드 실행
+RUN chmod +x ./mvnw
+RUN ./mvnw clean package -DskipTests
 
-# 3. 빌드된 jar 파일을 도커 이미지 안으로 복사
-COPY target/*.jar app.jar
-
-# 4. 외부로 열어줄 포트 번호
+# --- 2단계: 서빙하기 (만들어진 .jar 파일만 가져와서 가볍게 실행하기) ---
+FROM eclipse-temurin:25-jdk
+WORKDIR /app
+# 1단계(builder)에서 완성된 .jar 파일만 복사해 옴
+COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
-
-# 5. 컨테이너가 켜질 때 실행할 명령어
+# 서버 실행!
 ENTRYPOINT ["java", "-jar", "app.jar"]
