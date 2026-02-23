@@ -33,6 +33,12 @@
                 </button>
             </div>
         </div>
+        
+        <div id="history-section" class="mb-8 hidden">
+            <h3 class="text-sm font-bold text-slate-500 mb-3 ml-1">📚 최근 생성 기록</h3>
+            <div id="history-list" class="flex flex-wrap gap-2">
+                </div>
+        </div>
 
         <div id="loading" class="hidden text-center py-10">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
@@ -86,7 +92,50 @@
             } finally {
                 loading.classList.add('hidden');
                 btn.disabled = false;
+                loadHistory(); // <--- 새로 생성 후 히스토리 목록 업데이트!
             }
+        }
+
+        // 1. 페이지가 켜지면 제일 먼저 히스토리를 불러옵니다!
+        window.onload = loadHistory;
+
+        // 2. 백엔드에서 과거 기록을 가져오는 함수
+        async function loadHistory() {
+            try {
+                // GET 방식으로 /api/roadmap 호출
+                const response = await fetch('/api/roadmap'); 
+                const roadmaps = await response.json();
+                
+                const historySection = document.getElementById('history-section');
+                const historyList = document.getElementById('history-list');
+                
+                // 데이터가 1개라도 있으면 영역을 보여줍니다.
+                if (roadmaps.length > 0) {
+                    historySection.classList.remove('hidden');
+                    historyList.innerHTML = ''; // 기존 목록 비우기
+                    
+                    // 과거 기록을 버튼으로 쫙 만들어줍니다.
+                    roadmaps.forEach(roadmap => {
+                        const btn = document.createElement('button');
+                        btn.className = 'bg-white border border-slate-200 hover:border-blue-500 hover:text-blue-600 text-slate-600 px-4 py-2 rounded-full text-sm transition-all shadow-sm';
+                        btn.innerText = roadmap.topic;
+                        
+                        // 버튼을 누르면 AI 통신 없이 즉시 화면에 렌더링!
+                        btn.onclick = () => showSavedRoadmap(roadmap.topic, roadmap.content);
+                        historyList.appendChild(btn);
+                    });
+                }
+            } catch (error) {
+                console.error("히스토리 로딩 실패:", error);
+            }
+        }
+
+        // 3. 저장된 로드맵을 화면에 즉시 띄우는 함수
+        function showSavedRoadmap(topic, content) {
+            document.getElementById('topic').value = topic;
+            document.getElementById('result').innerHTML = marked.parse(content);
+            document.getElementById('result-card').classList.remove('hidden');
+            window.scrollTo({ top: document.getElementById('result-card').offsetTop, behavior: 'smooth' });
         }
     </script>
 </body>

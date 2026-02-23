@@ -4,10 +4,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ai.practice.demo.dto.RoadmapResponse;
+import com.ai.practice.demo.entity.Roadmap;
 import com.ai.practice.demo.service.GeminiService;
+
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.beans.factory.annotation.Value;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/roadmap")
@@ -38,5 +43,9 @@ public class RoadmapController {
         // 4. 비밀번호가 맞으면 가방에서 주제(request.topic())를 꺼내 AI에게 전달합니다.
         return geminiService.getRoadmap(request.topic());
     }
-    
+    @GetMapping 
+    public List<Roadmap> getHistory() {
+        // GET /api/roadmap 으로 요청이 오면 DB의 모든 기록을 던져줍니다!
+        return geminiService.getAllRoadmaps();
+    }
 }

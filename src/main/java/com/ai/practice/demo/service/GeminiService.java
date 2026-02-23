@@ -7,6 +7,8 @@ import com.google.genai.Client;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class GeminiService {
 
@@ -50,5 +52,9 @@ public class GeminiService {
             e.printStackTrace();
             return new RoadmapResponse("Gemini 호출 실패: " + e.getMessage());
         }
+    }
+
+    public List<Roadmap> getAllRoadmaps() {
+        return roadmapRepository.findAll(); 
     }
 }
