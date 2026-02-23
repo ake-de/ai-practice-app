@@ -64,9 +64,20 @@
             resultCard.classList.add('hidden');
 
             try {
-                const response = await fetch(`/api/roadmap?topic=${encodeURIComponent(topic)}&passcode=${encodeURIComponent(passcode)}`);
-                const data = await response.json();
+                // 변경된 부분: URL 뒤에 ?topic=...&passcode=... 가 완전히 사라졌습니다!
+                const response = await fetch('/api/roadmap', {
+                    method: 'POST', // "나 지금 엽서 말고 소포(POST) 보낸다!" 선언
+                    headers: {
+                        'Content-Type': 'application/json' // "이 소포 안에는 JSON 형식의 데이터가 들어있어"
+                    },
+                    body: JSON.stringify({ // 데이터를 금고(Body) 안에 넣고 잠급니다(stringify).
+                        topic: topic,
+                        passcode: passcode
+                    })
+                });
                 
+                const data = await response.json();
+
                 // 마크다운을 HTML로 변환하여 삽입
                 resultDiv.innerHTML = marked.parse(data.content);
                 resultCard.classList.remove('hidden');
